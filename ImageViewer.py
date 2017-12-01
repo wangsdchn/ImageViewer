@@ -9,7 +9,7 @@ import sys
  
 #这里我们提供必要的引用。基本控件位于pyqt5.qtwidgets模块中。
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QPushButton,QGridLayout,QLabel
+from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QPushButton,QGridLayout,QLabel,QSplitter
 from PyQt5.QtGui import QPixmap
 #%%
  
@@ -22,18 +22,23 @@ class ImageViewer(QWidget):
         self.resize(640,480)
         self.setWindowTitle('ImageViewer')
         self.readImgBtn = QPushButton('ReadImg', self)
+        self.readImgBtn.setFixedSize(self.readImgBtn.size())
+        
         self.showImgLabel = QLabel('image')
         self.showImgLabel.setFixedSize(800,600)
         self.showImgLabel.setAlignment(Qt.AlignCenter)
-        self.showImgLabel.setMouseTracking(True)
-        
-        self.image = QPixmap('E:/wsd/index.jpg')
-        self.showImgLabel.setPixmap(self.image)
+        self.showImgLabel.setMouseTracking(True)        
+        self.image = QPixmap()
+        splitterMain = QSplitter(self)
+        splitterMain.addWidget(self.readImgBtn)
+        splitterMain.addWidget(self.showImgLabel)
+        splitterMain.setOrientation(Qt.Horizontal)
         mainLayout = QGridLayout(self)
-        mainLayout.addWidget(self.readImgBtn,0,0)
-        mainLayout.addWidget(self.showImgLabel,0,1)
+        mainLayout.addWidget(splitterMain)
+        #mainLayout.addWidget(self.readImgBtn,0,0)
+        #mainLayout.addWidget(self.showImgLabel,1,2)
         
-        #readImgBtn.clicked.connect(self.showImage)
+        self.readImgBtn.clicked.connect(self.readImage)
     def wheelEvent(self,event):
         delta = event.angleDelta()
         numDegress = delta.y()/8
@@ -42,9 +47,11 @@ class ImageViewer(QWidget):
         else:
             self.scale /= 1.2
         self.showImage()
-        #event.accept()
     def showImage(self):
         self.showImgLabel.setPixmap(self.image.scaled(800*self.scale,600*self.scale,Qt.KeepAspectRatio))
+    def readImage(self):
+        self.image=QPixmap('E:/wsd/index.jpg')
+        self.showImgLabel.setPixmap(self.image)
     """
     def closeEvent(self,event):
         reply = QMessageBox.question(self,'Message','Are you sure to exit?',QMessageBox.Yes|QMessageBox.No,QMessageBox.No)

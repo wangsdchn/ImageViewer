@@ -19,26 +19,25 @@ class ImageViewer(QWidget):
         self.scale = 1.0
         self.initUI()  
     def initUI(self):
-        self.resize(640,480)
-        self.setWindowTitle('ImageViewer')
-        self.readImgBtn = QPushButton('ReadImg', self)
-        self.readImgBtn.setFixedSize(self.readImgBtn.size())
-        
+        self.readImgBtn = QPushButton('ReadImg')
+        #self.readImgBtn.setFixedSize(self.readImgBtn.size())
         self.showImgLabel = QLabel('image')
-        self.showImgLabel.setFixedSize(800,600)
         self.showImgLabel.setAlignment(Qt.AlignCenter)
-        self.showImgLabel.setMouseTracking(True)        
+        self.showImgLabel.setMouseTracking(True)
+       
         self.image = QPixmap()
-        splitterMain = QSplitter(self)
-        splitterMain.addWidget(self.readImgBtn)
-        splitterMain.addWidget(self.showImgLabel)
-        splitterMain.setOrientation(Qt.Horizontal)
-        mainLayout = QGridLayout(self)
-        mainLayout.addWidget(splitterMain)
-        #mainLayout.addWidget(self.readImgBtn,0,0)
-        #mainLayout.addWidget(self.showImgLabel,1,2)
+               
+        self.splitterRight = QSplitter(Qt.Vertical)
+        self.splitterRight.addWidget(self.showImgLabel)
+        self.splitterMain = QSplitter(Qt.Horizontal,self)
+        self.splitterMain.addWidget(self.readImgBtn)
+        self.splitterMain.addWidget(self.splitterRight)
         
+        self.splitterMain.setStretchFactor(0,0)
+        self.splitterMain.setStretchFactor(1,1)
+        self.splitterMain.resize(800,600)
         self.readImgBtn.clicked.connect(self.readImage)
+
     def wheelEvent(self,event):
         delta = event.angleDelta()
         numDegress = delta.y()/8

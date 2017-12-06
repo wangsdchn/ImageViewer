@@ -8,7 +8,7 @@ import sys
 import cv2
 #这里我们提供必要的引用。基本控件位于pyqt5.qtwidgets模块中。
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton,QLabel,QHBoxLayout,QVBoxLayout,QLayout
+from PyQt5.QtWidgets import QApplication, QWidget, QPushButton,QLabel,QHBoxLayout,QVBoxLayout,QLayout,QScrollArea
 from PyQt5.QtGui import QPixmap,QImage
 #%%
  
@@ -24,13 +24,16 @@ class ImageViewer(QWidget):
         self.showImgLabel = QLabel('image')
         self.showImgLabel.setAlignment(Qt.AlignCenter)
         self.showImgLabel.setMouseTracking(True)
-        self.showImgLabel.setFixedSize(640,480)
+        #self.showImgLabel.setFixedSize(640,480)
+        self.scrollArea = QScrollArea()
+        self.scrollArea.setWidget(self.showImgLabel)
+        self.scrollArea.setAlignment(Qt.AlignCenter)
         
         self.leftLayout = QVBoxLayout()
         self.leftLayout.addWidget(self.readImgBtn)
         self.leftLayout.setSpacing(6)
         self.rightLayout = QVBoxLayout()
-        self.rightLayout.addWidget(self.showImgLabel)
+        self.rightLayout.addWidget(self.scrollArea)
         #self.rightLayout.setSpacing(6)
         self.rightLayout.setSizeConstraint(QLayout.SetFixedSize)
         self.mainLayout = QHBoxLayout(self)
@@ -39,16 +42,8 @@ class ImageViewer(QWidget):
         self.mainLayout.setStretchFactor(self.leftLayout,1)
         self.mainLayout.setStretchFactor(self.rightLayout,5)
         self.mainLayout.setSpacing(6)
-        
-        self.sizeWin = self.size()
         self.readImgBtn.clicked.connect(self.readImage)
 
-    def resizeEvent(self,event): 
-        sizeold=self.sizeWin
-        #self.sizeWin = self.size()
-        #sizedif = self.sizeWin-sizeold
-        #self.showImgLabel.setFixedSize(640,480)
-        #self.showImgLabel.resize(640+sizedif[0],480+sizedif[1])
     def wheelEvent(self,event):
         delta = event.angleDelta()
         numDegress = delta.y()/8
@@ -63,14 +58,18 @@ class ImageViewer(QWidget):
         h,w,c = scaleMat.shape
         bytesPerLine = c * w
         self.qimage=QImage(scaleMat.data,w,h,bytesPerLine,QImage.Format_RGB888)
+        self.showImgLabel.resize(self.qimage.size())
         self.showImgLabel.setPixmap(QPixmap.fromImage(self.qimage))
+        
     def readImage(self):
-        self.image=cv2.imread('E:/wsd/index.jpg')
+        self.image=cv2.imread('E:/wsd/0000.bmp')
         cv2.cvtColor(self.image,cv2.COLOR_BGR2RGB,self.image)
         height, width, bytesPerComponent = self.image.shape
         bytesPerLine = bytesPerComponent * width
         self.qimage = QImage(self.image.data,width,height,bytesPerLine,QImage.Format_RGB888)
+        self.showImgLabel.resize(self.qimage.size())
         self.showImgLabel.setPixmap(QPixmap.fromImage(self.qimage))
+        
     """
     def closeEvent(self,event):
         reply = QMessageBox.question(self,'Message','Are you sure to exit?',QMessageBox.Yes|QMessageBox.No,QMessageBox.No)

@@ -8,7 +8,7 @@ import sys
 import cv2
 #这里我们提供必要的引用。基本控件位于pyqt5.qtwidgets模块中。
 from PyQt5.QtCore import Qt,QPoint,QRect,QSize
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton,QLabel,QHBoxLayout,QVBoxLayout,QLayout,QScrollArea
+from PyQt5.QtWidgets import QApplication,QWidget, QPushButton,QLabel,QGridLayout, QHBoxLayout,QVBoxLayout,QLayout,QScrollArea,QComboBox
 from PyQt5.QtGui import QPixmap,QImage
 #%%
  
@@ -29,8 +29,14 @@ class ImageViewer(QWidget):
         self.readImgBtn.setMaximumSize(500,30)
         
         self.showImgLabel = QLabel('image')
-        #self.showImgLabel.setAlignment(Qt.AlignCenter)
         self.showImgLabel.setMouseTracking(True)
+        
+        self.combox_label = QComboBox()
+        self.combox_label.addItem('0')
+        self.combox_label.addItem('1')
+        self.combox_label.addItem('2')
+        
+        self.saveImgBtn = QPushButton(('SaveImg'))        
         
         self.scrollArea = QScrollArea()
         self.scrollArea.setWidget(self.showImgLabel)
@@ -40,17 +46,18 @@ class ImageViewer(QWidget):
         
         self.leftLayout = QVBoxLayout()
         self.leftLayout.addWidget(self.readImgBtn)
+        self.leftLayout.addWidget(self.combox_label)
+        self.leftLayout.addWidget(self.saveImgBtn)
         self.leftLayout.setSpacing(6)
         self.rightLayout = QVBoxLayout()
         self.rightLayout.addWidget(self.scrollArea)
-        #self.rightLayout.setSpacing(6)
         self.rightLayout.setSizeConstraint(QLayout.SetFixedSize)
-        self.mainLayout = QHBoxLayout(self)
-        self.mainLayout.addLayout(self.leftLayout)
-        self.mainLayout.addLayout(self.rightLayout)
-        self.mainLayout.setStretchFactor(self.leftLayout,1)
-        self.mainLayout.setStretchFactor(self.rightLayout,5)
+        
+        self.mainLayout = QGridLayout(self)
+        self.mainLayout.addLayout(self.leftLayout,0,0)
+        self.mainLayout.addLayout(self.rightLayout,0,1)
         self.mainLayout.setSpacing(6)
+        self.resize(640,480)
         self.readImgBtn.clicked.connect(self.readImage)
 
     def wheelEvent(self,event):
@@ -70,9 +77,9 @@ class ImageViewer(QWidget):
             curSize = self.showImgLabel.size()
             disX = int((curSize.width() - preSize.width())/2)
             disY = int((curSize.height() - preSize.height())/2)
-            print(preSize,curSize,disX,disY)
-            print(self.showImgLabel.geometry().height(),self.scrollArea.verticalScrollBar().value())
-            print(self.showImgLabel.geometry().width(),self.scrollArea.horizontalScrollBar().value())
+            #print(preSize,curSize,disX,disY)
+            #print(self.showImgLabel.geometry().height(),self.scrollArea.verticalScrollBar().value())
+            #print(self.showImgLabel.geometry().width(),self.scrollArea.horizontalScrollBar().value())
             self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().value() + disY)
             self.scrollArea.horizontalScrollBar().setValue(self.scrollArea.horizontalScrollBar().value() + disX)
     def mouseMoveEvent(self,event):

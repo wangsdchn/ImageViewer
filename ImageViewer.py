@@ -27,7 +27,7 @@ class ImageViewer(QWidget):
         self.releasePos = None
         self.rectList = []
         self.imageCount = [0]*100
-        self.imageVec = ['']
+        self.imageVec = []
         self.imageVecIter = 0
         self.x1 = self.y1 = self.x2 = self.y2 = 0
         self.initUI()
@@ -187,6 +187,8 @@ class ImageViewer(QWidget):
         cv2.cvtColor(self.image,cv2.COLOR_BGR2RGB,self.image)
         self.showImage()
     def saveRoiImage(self):
+        if len(self.imageVec)==0:
+            return
         h,w,c = self.image.shape     #去除框边缘
         scaleMat = cv2.resize(self.image,(int(self.scale*w),int(self.scale*h)),interpolation = cv2.INTER_AREA)
         cv2.cvtColor(scaleMat,cv2.COLOR_RGB2BGR,scaleMat)
@@ -200,6 +202,8 @@ class ImageViewer(QWidget):
             self.imageCount[label] += 1
     def openAFolder(self):
         path = QFileDialog.getExistingDirectory(self,'Select A Folder','D:/src')
+        if path == '':
+            return
         path += '/'
         self.savePath.setText(path)
         
@@ -234,14 +238,19 @@ class ImageViewer(QWidget):
                 self.imageVec.append(path + filelist[i])
                 if path + filelist[i] == file[0]:
                     self.imageVecIter = i
-        self.readImage(self.imageVec[self.imageVecIter])
+        if len(self.imageVec) > 0:
+            self.readImage(self.imageVec[self.imageVecIter])
     def nextImage(self):
+        if len(self.imageVec)==0:
+            return
         if self.imageVecIter == len(self.imageVec)-1:
             return
         else:
             self.imageVecIter += 1
         self.readImage(self.imageVec[self.imageVecIter])
     def LastImage(self):
+        if len(self.imageVec)==0:
+            return
         if self.imageVecIter == 0:
             return
         else:

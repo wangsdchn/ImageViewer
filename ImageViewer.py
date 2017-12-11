@@ -188,11 +188,11 @@ class ImageViewer(QWidget):
         self.showImage()
     def saveRoiImage(self):
         h,w,c = self.image.shape     #去除框边缘
-        self.scaleMat = cv2.resize(self.image,(int(self.scale*w),int(self.scale*h)),interpolation = cv2.INTER_AREA)
+        scaleMat = cv2.resize(self.image,(int(self.scale*w),int(self.scale*h)),interpolation = cv2.INTER_AREA)
+        cv2.cvtColor(scaleMat,cv2.COLOR_RGB2BGR,scaleMat)
         for i in range(len(self.rectList)):
             label,x1,y1,x2,y2 = self.rectList[i]
-            roi = self.scaleMat[y1:y2,x1:x2]
-            cv2.cvtColor(roi,cv2.COLOR_RGB2BGR,roi)
+            roi = scaleMat[y1:y2,x1:x2]            
             label = int(label)
             name = self.savePath.text() + '%.2d_%.4d.jpg'%(label,self.imageCount[label])
             #cv2.imwrite(name,roi)

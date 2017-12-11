@@ -23,6 +23,7 @@ class ImageViewer(QWidget):
         self.pressPos = None
         self.releasePos = None
         self.rectList = []
+        self.imageCount = [0]*100
         self.x1 = self.y1 = self.x2 = self.y2 = 0
         self.initUI()
     def initUI(self):
@@ -64,6 +65,7 @@ class ImageViewer(QWidget):
         self.saveImgBtn.clicked.connect(self.saveRoiImage)
 
     def wheelEvent(self,event):
+        print(self.showImgLabel.geometry(),self.scrollArea.verticalScrollBar().value(),self.scrollArea.horizontalScrollBar().value())
         self.rectList.clear()
         x = self.showImgLabel.geometry().x() + self.rightLayout.geometry().x()
         y = self.showImgLabel.geometry().y() + self.rightLayout.geometry().y()
@@ -86,6 +88,7 @@ class ImageViewer(QWidget):
             #print(self.showImgLabel.geometry().width(),self.scrollArea.horizontalScrollBar().value())
             self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().value() + disY)
             self.scrollArea.horizontalScrollBar().setValue(self.scrollArea.horizontalScrollBar().value() + disX)
+            print(self.showImgLabel.geometry(),self.scrollArea.verticalScrollBar().value(),self.scrollArea.horizontalScrollBar().value())
     def mouseMoveEvent(self,event):
         if self.bDrawRect:
             self.releasePos = event.pos()
@@ -118,15 +121,16 @@ class ImageViewer(QWidget):
         x3 = event.x() - self.rightLayout.geometry().x() - self.showImgLabel.pos().x()
         y3 = event.y() - self.rightLayout.geometry().y() - self.showImgLabel.pos().y()
         for i in range(len(self.rectList)):
-            x1,y1,x2,y2 = self.rectList[i]
+            label,x1,y1,x2,y2 = self.rectList[i]
             if x1<x3<x2 and y1<y3<y2:
                 del self.rectList[i]
                 break
         h,w,c = self.image.shape
         scaleMat = cv2.resize(self.image,(int(self.scale*w),int(self.scale*h)),interpolation = cv2.INTER_AREA)
         for i in range(len(self.rectList)):
-            x1,y1,x2,y2 = self.rectList[i]
+            label,x1,y1,x2,y2 = self.rectList[i]
             cv2.rectangle(scaleMat,(x1,y1),(x2,y2),(0,255,0),2)
+            cv2.putText(scaleMat,label,(x1,y1),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),1)
         h,w,c = scaleMat.shape
         bytesPerLine = c * w
         self.qimage=QImage(scaleMat.data,w,h,bytesPerLine,QImage.Format_RGB888)
@@ -137,14 +141,16 @@ class ImageViewer(QWidget):
             self.pressPos = QPoint(0,0)
             self.bMousePress = False
             self.bDrawRect = False
-            self.rectList.append([self.x1,self.y1,self.x2,self.y2])
+            label = self.combox_label.currentText()
+            self.rectList.append([label,self.x1,self.y1,self.x2,self.y2])
             #print(self.x1,self.y1,self.x2,self.y2)
     def showImage(self):
         h,w,c = self.image.shape
         self.scaleMat = cv2.resize(self.image,(int(self.scale*w),int(self.scale*h)),interpolation = cv2.INTER_AREA)
         for i in range(len(self.rectList)):
-            x1,y1,x2,y2 = self.rectList[i]
+            label,x1,y1,x2,y2 = self.rectList[i]
             cv2.rectangle(self.scaleMat,(x1,y1),(x2,y2),(0,255,0),2)
+            cv2.putText(self.scaleMat,label,(x1,y1),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),1)
         if self.bDrawRect:
             self.x1 = self.pressPos.x() - self.rightLayout.geometry().x() - self.showImgLabel.pos().x()
             self.y1 = self.pressPos.y() - self.rightLayout.geometry().y() - self.showImgLabel.pos().y()
@@ -152,6 +158,8 @@ class ImageViewer(QWidget):
             self.y2 = self.releasePos.y() - self.rightLayout.geometry().y() - self.showImgLabel.pos().y()
             #print(self.x1,self.y1,self.x2,self.y2)
             cv2.rectangle(self.scaleMat,(self.x1,self.y1),(self.x2,self.y2),(0,255,0),2)
+            label = self.combox_label.currentText()
+            cv2.putText(self.scaleMat,label,(self.x1,self.y1),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),1)
         h,w,c = self.scaleMat.shape
         bytesPerLine = c * w
         self.qimage=QImage(self.scaleMat.data,w,h,bytesPerLine,QImage.Format_RGB888)
@@ -163,14 +171,16 @@ class ImageViewer(QWidget):
         cv2.cvtColor(self.image,cv2.COLOR_BGR2RGB,self.image)
         self.showImage()
     def saveRoiImage(self):
-        h,w,c = self.image.shape
+        h,w,c = self.image.shape     #去除框边缘
         self.scaleMat = cv2.resize(self.image,(int(self.scale*w),int(self.scale*h)),interpolation = cv2.INTER_AREA)
         for i in range(len(self.rectList)):
-            x1,y1,x2,y2 = self.rectList[i]
+            label,x1,y1,x2,y2 = self.rectList[i]
             roi = self.scaleMat[y1:y2,x1:x2]
             cv2.cvtColor(roi,cv2.COLOR_RGB2BGR,roi)
-            name = '%.4d.jpg'%i
+            label = int(label)
+            name = '%.2d_%.4d.jpg'%(label,self.imageCount[label])
             cv2.imwrite(name,roi)
+            self.imageCount[label] += 1
     """
     def closeEvent(self,event):
         reply = QMessageBox.question(self,'Message','Are you sure to exit?',QMessageBox.Yes|QMessageBox.No,QMessageBox.No)

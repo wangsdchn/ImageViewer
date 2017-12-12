@@ -158,8 +158,13 @@ class ImageViewer(QWidget):
             self.rectList.append([label,self.x1,self.y1,self.x2,self.y2])
             #print(self.x1,self.y1,self.x2,self.y2)
     def showImage(self):
+        name = self.imageVec[self.imageVecIter]
+        n = name.rfind('/')
+        name = name[n+1:]
         h,w,c = self.image.shape
+        cv2.putText(self.image,name,(10,25),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),1)
         self.scaleMat = cv2.resize(self.image,(int(self.scale*w),int(self.scale*h)),interpolation = cv2.INTER_AREA)
+        
         for i in range(len(self.rectList)):
             label,x1,y1,x2,y2 = self.rectList[i]
             cv2.rectangle(self.scaleMat,(x1,y1),(x2,y2),(0,255,0),2)
@@ -247,6 +252,7 @@ class ImageViewer(QWidget):
             return
         else:
             self.imageVecIter += 1
+        self.rectList.clear()
         self.readImage(self.imageVec[self.imageVecIter])
     def LastImage(self):
         if len(self.imageVec)==0:
@@ -255,6 +261,7 @@ class ImageViewer(QWidget):
             return
         else:
             self.imageVecIter -= 1
+        self.rectList.clear()
         self.readImage(self.imageVec[self.imageVecIter])
     """
     def closeEvent(self,event):

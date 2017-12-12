@@ -229,6 +229,7 @@ class ImageViewer(QWidget):
         self.imageVecIter = 0
         self.imageVec.clear()
         file = QFileDialog.getOpenFileName(self,'Select An Image','D:/src','bmp files(*.bmp);;png files(*.png);;jpg files(*.jpg);;All files(*)')
+        print(file[0])
         if file == '':
             return
         n = file[0].rfind('/')
@@ -238,15 +239,19 @@ class ImageViewer(QWidget):
         n = file[0].rfind('.')
         imgtype = file[0][n+1:]
         filelist = os.listdir(path)
+        k = 0
         for i in range(len(filelist)):
             if filelist[i][-3:] != imgtype:
                 continue
             else:
                 self.imageVec.append(path + filelist[i])
+                k += 1
                 if path + filelist[i] == file[0]:
-                    self.imageVecIter = i
+                    print(i,path + filelist[i])
+                    self.imageVecIter = k - 1
         if len(self.imageVec) > 0:
             self.readImage(self.imageVec[self.imageVecIter])
+            print(len(self.imageVec),self.imageVec[self.imageVecIter])
     def nextImage(self):
         if len(self.imageVec)==0:
             return

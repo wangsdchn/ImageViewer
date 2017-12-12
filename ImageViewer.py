@@ -99,8 +99,8 @@ class ImageViewer(QWidget):
             curSize = self.showImgLabel.size()
             disX = int((curSize.width() - preSize.width())/2)
             disY = int((curSize.height() - preSize.height())/2)
-            self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().value() + disY)
-            self.scrollArea.horizontalScrollBar().setValue(self.scrollArea.horizontalScrollBar().value() + disX)
+            #self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().value() + disY)
+            #self.scrollArea.horizontalScrollBar().setValue(self.scrollArea.horizontalScrollBar().value() + disX)
             #print(self.showImgLabel.geometry(),self.scrollArea.verticalScrollBar().value(),self.scrollArea.horizontalScrollBar().value())
     def mouseMoveEvent(self,event):
         if self.bDrawRect:

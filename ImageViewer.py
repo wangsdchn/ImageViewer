@@ -155,7 +155,8 @@ class ImageViewer(QWidget):
             self.bMousePress = False
             self.bDrawRect = False
             label = self.combox_label.currentText()
-            self.rectList.append([label,self.x1,self.y1,self.x2,self.y2])
+            if self.x1 < self.x2 - 5 and self.y1 < self.y2 - 5:
+                self.rectList.append([label,self.x1,self.y1,self.x2,self.y2])
             #print(self.x1,self.y1,self.x2,self.y2)
     def showImage(self):
         name = self.imageVec[self.imageVecIter]
@@ -175,9 +176,10 @@ class ImageViewer(QWidget):
             self.x2 = self.releasePos.x() - self.MidLayout.geometry().x() - self.showImgLabel.pos().x()
             self.y2 = self.releasePos.y() - self.MidLayout.geometry().y() - self.showImgLabel.pos().y()
             #print(self.x1,self.y1,self.x2,self.y2)
-            cv2.rectangle(self.scaleMat,(self.x1,self.y1),(self.x2,self.y2),(0,255,0),2)
-            label = self.combox_label.currentText()
-            cv2.putText(self.scaleMat,label,(self.x1,self.y1),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),1)
+            if self.x1 < self.x2 and self.y1 < self.y2:
+                cv2.rectangle(self.scaleMat,(self.x1,self.y1),(self.x2,self.y2),(0,255,0),2)
+                label = self.combox_label.currentText()
+                cv2.putText(self.scaleMat,label,(self.x1,self.y1),cv2.FONT_HERSHEY_SIMPLEX,1,(255,0,0),1)
         h,w,c = self.scaleMat.shape
         bytesPerLine = c * w
         self.qimage=QImage(self.scaleMat.data,w,h,bytesPerLine,QImage.Format_RGB888)

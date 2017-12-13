@@ -189,7 +189,7 @@ class ImageViewer(QWidget):
     def readImage(self,path=''):
         #self.image=cv2.imread(path)
         self.image = cv2.imdecode(np.fromfile(path,dtype=np.uint8),-1)
-        if self.image == None:
+        if self.image.all():
             return
         cv2.cvtColor(self.image,cv2.COLOR_BGR2RGB,self.image)
         self.showImage()
@@ -228,8 +228,7 @@ class ImageViewer(QWidget):
     def openAnImage(self):
         self.imageVecIter = 0
         self.imageVec.clear()
-        file = QFileDialog.getOpenFileName(self,'Select An Image','D:/src','bmp files(*.bmp);;png files(*.png);;jpg files(*.jpg);;All files(*)')
-        print(file[0])
+        file = QFileDialog.getOpenFileName(self,'Select An Image','D:/src','bmp files(*.bmp);;png files(*.png);;jpg files(*.jpg)')
         if file == '':
             return
         n = file[0].rfind('/')
@@ -247,11 +246,9 @@ class ImageViewer(QWidget):
                 self.imageVec.append(path + filelist[i])
                 k += 1
                 if path + filelist[i] == file[0]:
-                    print(i,path + filelist[i])
                     self.imageVecIter = k - 1
         if len(self.imageVec) > 0:
             self.readImage(self.imageVec[self.imageVecIter])
-            print(len(self.imageVec),self.imageVec[self.imageVecIter])
     def nextImage(self):
         if len(self.imageVec)==0:
             return

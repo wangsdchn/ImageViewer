@@ -29,6 +29,7 @@ class ImageViewer(QWidget):
         self.imageCount = [0]*100
         self.imageVec = []
         self.imageVecIter = 0
+        self.bCtrlPress = False
         self.x1 = self.y1 = self.x2 = self.y2 = 0
         self.initUI()
     def initUI(self):
@@ -81,7 +82,14 @@ class ImageViewer(QWidget):
         self.lastBtn.clicked.connect(self.LastImage)
         self.savePathBtn.clicked.connect(self.openAFolder)
 
+    def keyPressEvent(self,event):
+        if event.key() == Qt.Key_Control:
+            self.bCtrlPress = True
+    def keyReleaseEvent(self,event):
+        self.bCtrlPress = False
     def wheelEvent(self,event):
+        if not self.bCtrlPress:
+            return
         self.rectList.clear()
         x = self.showImgLabel.geometry().x() + self.MidLayout.geometry().x()
         y = self.showImgLabel.geometry().y() + self.MidLayout.geometry().y()

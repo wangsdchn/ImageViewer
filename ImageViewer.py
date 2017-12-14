@@ -236,6 +236,7 @@ class ImageViewer(QWidget):
     def openAnImage(self):
         self.imageVecIter = 0
         self.imageVec.clear()
+        self.rectList.clear()
         file = QFileDialog.getOpenFileName(self,'Select An Image','D:/src','bmp files(*.bmp);;png files(*.png);;jpg files(*.jpg *jpeg)')
         if file == '':
             return

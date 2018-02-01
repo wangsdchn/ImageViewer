@@ -95,7 +95,6 @@ class ImageViewer(QWidget):
         y = self.showImgLabel.geometry().y() + self.MidLayout.geometry().y()
         w,h = self.showImgLabel.geometry().width(),self.showImgLabel.geometry().height()
         qrect = QRect(QPoint(x,y),QSize(w,h))
-        preSize = self.showImgLabel.size()
         if qrect.contains(event.pos()):
             delta = event.angleDelta()
             numDegress = delta.y()/8
@@ -104,12 +103,6 @@ class ImageViewer(QWidget):
             else:
                 self.scale /= 1.2
             self.showImage()
-            curSize = self.showImgLabel.size()
-            disX = int((curSize.width() - preSize.width())/2)
-            disY = int((curSize.height() - preSize.height())/2)
-            #self.scrollArea.verticalScrollBar().setValue(self.scrollArea.verticalScrollBar().value() + disY)
-            #self.scrollArea.horizontalScrollBar().setValue(self.scrollArea.horizontalScrollBar().value() + disX)
-            #print(self.showImgLabel.geometry(),self.scrollArea.verticalScrollBar().value(),self.scrollArea.horizontalScrollBar().value())
     def mouseMoveEvent(self,event):
         if self.bDrawRect:
             self.releasePos = event.pos()
@@ -209,12 +202,15 @@ class ImageViewer(QWidget):
         cv2.cvtColor(scaleMat,cv2.COLOR_RGB2BGR,scaleMat)
         for i in range(len(self.rectList)):
             label,x1,y1,x2,y2 = self.rectList[i]
-            roi = scaleMat[y1:y2,x1:x2]            
-            label = int(label)
-            name = self.savePath.text() + '%.2d_%.4d.jpg'%(label,self.imageCount[label])
-            #cv2.imwrite(name,roi)
-            cv2.imencode('.jpg',roi)[1].tofile(name)
-            self.imageCount[label] += 1
+            #roi = scaleMat[y1:y2,x1:x2]            
+            #label = int(label)
+            #name = self.savePath.text() + '%.2d_%.4d.jpg'%(label,self.imageCount[label])
+            #cv2.imencode('.jpg',roi)[1].tofile(name)
+            #self.imageCount[label] += 1
+            bbox = self.imageVec[self.imageVecIter] + ' ' + label + ' ' + str(x1) + ' ' + str(x2) + ' ' + str(y1) + ' ' + str(y2) + '\n'
+            f = open('train.txt','a')
+            f.write(bbox)
+            f.close()
     def openAFolder(self):
         path = QFileDialog.getExistingDirectory(self,'Select A Folder','D:/src')
         if path == '':

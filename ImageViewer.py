@@ -61,7 +61,7 @@ class ImageViewer(QWidget):
         self.combox_label = QComboBox()
         self.combox_label.addItem('0')
         self.combox_label.addItem('1')
-        self.combox_label.addItem('2')
+        #self.combox_label.addItem('2')
         self.saveImgBtn = QPushButton(('SaveImage'))
         
         self.BottomLayout = QHBoxLayout()
@@ -120,11 +120,11 @@ class ImageViewer(QWidget):
         y = self.showImgLabel.geometry().y() + self.MidLayout.geometry().y()
         w,h = self.showImgLabel.geometry().width(),self.showImgLabel.geometry().height()
         qrect = QRect(QPoint(x,y),QSize(w,h))
-        if qrect.contains(event.pos()) and Qt.LeftButton == event.buttons():
+        if qrect.contains(event.pos()) and Qt.RightButton == event.buttons():
             self.bMousePress = True
             self.bDrawRect = False
             self.pressPos = event.pos()
-        elif qrect.contains(event.pos()) and Qt.RightButton == event.button():
+        elif qrect.contains(event.pos()) and Qt.LeftButton == event.button():
             self.bDrawRect = True
             self.bMousePress = False
             self.pressPos = event.pos()
@@ -202,15 +202,15 @@ class ImageViewer(QWidget):
         cv2.cvtColor(scaleMat,cv2.COLOR_RGB2BGR,scaleMat)
         for i in range(len(self.rectList)):
             label,x1,y1,x2,y2 = self.rectList[i]
-            #roi = scaleMat[y1:y2,x1:x2]            
-            #label = int(label)
-            #name = self.savePath.text() + '%.2d_%.4d.jpg'%(label,self.imageCount[label])
-            #cv2.imencode('.jpg',roi)[1].tofile(name)
-            #self.imageCount[label] += 1
-            bbox = self.imageVec[self.imageVecIter] + ' ' + label + ' ' + str(x1) + ' ' + str(x2) + ' ' + str(y1) + ' ' + str(y2) + '\n'
-            f = open('train.txt','a')
-            f.write(bbox)
-            f.close()
+            roi = scaleMat[y1:y2,x1:x2]            
+            name = self.savePath.text() + label + '/' + '%.2d_%.4d.jpg'%(int(label),self.imageCount[int(label)])
+            print(label,name)
+            cv2.imencode('.jpg',roi)[1].tofile(name)
+            self.imageCount[int(label)] += 1
+            #bbox = self.imageVec[self.imageVecIter] + ' ' + label + ' ' + str(x1) + ' ' + str(x2) + ' ' + str(y1) + ' ' + str(y2) + '\n'
+            #f = open('train.txt','a')
+            #f.write(bbox)
+            #f.close()
     def openAFolder(self):
         path = QFileDialog.getExistingDirectory(self,'Select A Folder','D:/src')
         if path == '':

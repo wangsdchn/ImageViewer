@@ -202,7 +202,7 @@ class ImageViewer(QWidget):
         cv2.cvtColor(scaleMat,cv2.COLOR_RGB2BGR,scaleMat)
         for i in range(len(self.rectList)):
             label,x1,y1,x2,y2 = self.rectList[i]
-            roi = scaleMat[y1:y2,x1:x2]            
+            roi = scaleMat[x1:x2,y1:y2]
             name = self.savePath.text() + label + '/' + '%.2d_%.4d.jpg'%(int(label),self.imageCount[int(label)])
             print(label,name)
             cv2.imencode('.jpg',roi)[1].tofile(name)
@@ -222,13 +222,18 @@ class ImageViewer(QWidget):
         count = [0] * 100
         self.imageCount = [0] * 100
         for i in range(len(filelist)):
-            if filelist[i][-4:] != '.jpg' or len(filelist[i]) != 11 or filelist[i][2] != '_':
+            if '.' in filelist[i]:
+                print(filelist[i])
                 continue
             else:
-                label = int(filelist[i][0:2])
-                count[label] = int(filelist[i][3:7])
-                if self.imageCount[label] <= count[label]:
-                    self.imageCount[label] = count[label] + 1
+                filelist1 = os.listdir(path+'filelist[i]')
+                for j in range(len(filelist1)):
+                    if filelist[1][-4:] != 'jpg':
+                        continue
+                    label = int(filelist[i][0:2])
+                    count[label] = int(filelist[i][3:7])
+                    if self.imageCount[label] <= count[label]:
+                        self.imageCount[label] = count[label] + 1
     def openAnImage(self):
         self.imageVecIter = 0
         self.imageVec.clear()
